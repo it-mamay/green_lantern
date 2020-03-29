@@ -55,7 +55,7 @@ def test_set_cheetah_average_speed(age, result):
     (7, 4, 45),
     (9, 10, 35),
     (10, 20, 25),
-    (6, 100, "Your cat is died :(")
+    (6, 100, "Your cat is dead :(")
 ])
 def test_cat_run(age, hours, result):
     cat = Cat(age)
@@ -65,10 +65,10 @@ def test_cat_run(age, hours, result):
 
 @pytest.mark.parametrize("age, hours, result", [
     (1, 1, 35),
-    (7, 4, "Your cat is died :("),
+    (7, 4, "Your cat is dead :("),
     (16, 1, 45)
 ])
-def test_cat_run(age, hours, result):
+def test_cheetah_run(age, hours, result):
     cheetah = Cheetah(age)
     cheetah.run(hours)
     assert cheetah.get_saturation_level() == result
