@@ -36,7 +36,8 @@ class TestMove:
         (
                 ("N", "W"),
                 ("W", "S"),
-                ("S", "E")
+                ("S", "E"),
+                ("E", "N")
         )
     )
     def test_turn_left(self, curent_direction, expected_direction,):
@@ -49,7 +50,8 @@ class TestMove:
         (
                 ("E", "S"),
                 ("S", "W"),
-                ("W", "N")
+                ("W", "N"),
+                ("N", "E")
         )
     )
     def test_turn_right(self, curent_direction, expected_direction):
