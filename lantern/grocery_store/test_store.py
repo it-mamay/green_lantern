@@ -19,36 +19,37 @@ class Initializer:
 
 
 class TestUsers(Initializer):
+
     def test_create_new(self):
         resp = self.client.post(
             '/users',
-            json={'name':'John Doe'}
+            json={'name': 'John Doe'}
         )
         assert resp.status_code == 201
         assert resp.json == {'user_id': 1}
 
         resp = self.client.post(
             '/users',
-            json={'name':'Andrew Derkach'}
+            json={'name': 'Ihor Melnyk'}
         )
         assert resp.json == {'user_id': 2}
 
     def test_successful_get_user(self):
         resp = self.client.post(
             '/users',
-            json={'name':'John Doe'}
+            json={'name': 'John Doe'}
         )
         user_id = resp.json['user_id']
         resp = self.client.get(f'/users/{user_id}')
         assert resp.status_code == 200
-        assert resp.json == {'name':'John Doe'}
+        assert resp.json == {'name': 'John Doe'}
 
     def test_get_unexistent_user(self):
-        resp = self.client.get(f'/users/1')
+        resp = self.client.get('/users/1')
         assert resp.status_code == 404
-        assert resp.json == {'error':'No such user_id 1'}
+        assert resp.json == {'error': 'No such user_id 1'}
 
-    def test_succesful_update_user(self):
+    def test_successful_update_user(self):
         resp = self.client.post(
             '/users',
             json={'name': 'John Doe'}
@@ -72,55 +73,59 @@ class TestUsers(Initializer):
 
 class TestGoods(Initializer):
 
-    def test_create_new_good(self):
+    def test_create_goods(self):
         resp = self.client.post(
             '/goods',
-            json=[{'good': 'Chocolate_bar', 'price': 10},
-                  {'good': 'Milk', 'price': 5}
-                  ]
+            json=[
+                {'name': 'Chocolate_bar', 'price': 10},
+                {'name': 'Vodka', 'price': 150}
+            ]
         )
         assert resp.status_code == 201
-        assert resp.json == {'numbers of items created': 2}
+        assert resp.json == {'numbers of items created': 2}  # len(resp.json)
 
-    def test_get_goods(self):
+    def test_successful_get_goods(self):
         resp = self.client.post(
             '/goods',
-            json=[{'good': 'Chocolate_bar', 'price': 15},
-                  {'good': 'Milk', 'price': 10}]
+            json=[
+                {'name': 'Chocolate_bar', 'price': 10},
+                {'name': 'Vodka', 'price': 150},
+                {'name': 'Viskaryk', 'price': 500},
+                {'name': 'Shmurdyak_try_topora', 'price': 15}
+            ]
         )
         resp = self.client.get('/goods')
         assert resp.status_code == 200
-        assert resp.json == [{'good': 'Chocolate_bar', 'price': 15, 'id': 1},
-                             {'good': 'Milk', 'price': 10, 'id': 2}]
+        assert resp.json == [
+            {'name': 'Chocolate_bar', 'price': 10, 'id': 1},
+            {'name': 'Vodka', 'price': 150, 'id': 2},
+            {'name': 'Viskaryk', 'price': 500, 'id': 3},
+            {'name': 'Shmurdyak_try_topora', 'price': 15, 'id': 4}
+        ]
 
-    # def test_update_goods(self):
-    #     resp = self.client.post(
-    #         '/goods',
-    #         json=[{'good': 'Chocolate_bar', 'price': 15},
-    #               {'good': 'Milk', 'price': 10}]
-    #     )
-    #     resp = self.client.put(
-    #         '/goods',
-    #         json=[{'good': 'Chocolate_bar', 'price': 20, 'id': 1},
-    #               {'good': 'Milk', 'price': 15, 'id': 2},
-    #               {'good': 'Snickers', 'price': 5, 'id': 3}]
-    #     )
-    #     assert resp.status_code == 200
-    #     assert resp.json == {'successfully_updated': 2, 'errors': {'no such id in goods': [3]}}
+    def test_successful_update_goods(self):
+        resp = self.client.post(
+            '/goods',
+            json=[
+                {'name': 'Chocolate_bar', 'price': 10, 'id': 1},
+                {'name': 'Vodka', 'price': 150, 'id': 2},
+                {'name': 'Viskaryk', 'price': 500, 'id': 3},
+                {'name': 'Shmurdyak_try_topora', 'price': 15, 'id': 4}
+            ]
+        )
 
-# class TestStores(Initializer):
-#
-#     def test_success_store_post(self):
-#         pass
-#
-#     def test_seccess_store_get(self):
-#         pass
-#
-#     def test_unexistent_store(self):
-#         pass
-#
-#     def test_succesful_update_store(self):
-#         pass
-#
-#     def test_unexistent_update_store(self):
-#         pass
+        resp = self.client.put(
+            '/goods',
+            json=[
+                {'name': 'Chocolate_bar', 'price': 11, 'id': 1},
+                {'name': 'Vodka', 'price': 151, 'id': 2},
+                {'name': 'Viskaryk', 'price': 500, 'id': 3},
+                {'name': 'Shmurdyak_try_topora', 'price': 15, 'id': 4},
+                {'name': 'Shmurdyak_try_topora', 'price': 15, 'id': 5}
+            ]
+        )
+        assert resp.status_code == 200
+        assert resp.json == {
+            'successfully_updated': 4,
+            'errors': {'no such id in goods': [5]}
+        }

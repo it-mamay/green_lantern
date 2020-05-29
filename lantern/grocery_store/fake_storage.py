@@ -6,7 +6,6 @@ class FakeStorage:
     def __init__(self):
         self._users = FakeUsers()
         self._goods = FakeGoods()
-        # self._stores = FakeStores()
 
     @property
     def users(self):
@@ -16,14 +15,12 @@ class FakeStorage:
     def goods(self):
         return self._goods
 
-    # @property
-    # def stores(self):
-    #     return self._stores
 
 class FakeUsers:
     def __init__(self):
         self._users = {}
         self._id_counter = count(1)
+        self._goods = {}
 
     def add(self, user):
         user_id = next(self._id_counter)
@@ -42,43 +39,31 @@ class FakeUsers:
         else:
             raise NoSuchUserError(user_id)
 
-class FakeGoods:
 
-    def __init__(self):
-        self._goods = {}
-        self._id_counter = count(1)
+class FakeGoods(FakeUsers):
 
-    def add(self, goods):
-        for item in goods:
-            self._goods[next(self._id_counter)] = item
+    def add_goods(self, goods):
+        for good in goods:
+            goods_id = next(self._id_counter)
+            self._goods[goods_id] = good
         return len(goods)
 
-    def get_goods(self):
-        response = []
-        for goods in self._goods.items():
-            tmp = goods[1]
-            _id = {'id': goods[0]}
-            tmp.update(_id)
-            response.append(tmp)
-        return response
+    def get_full_info_of_goods(self):
+        full_info = []
+        for key, value in self._goods.items():
+            # import pdb; pdb.set_trace()
+            full_info.append({**value, 'id': key})
+        return full_info
 
-#     def update_goods(self, goods_upd):
-#         updated = 0
-#         not_exist = []
-#         for good in goods_upd:
-#             id_upd = good['id']
-#             data_upd = self._goods.get(id_upd, '')
-#             # found id for update
-#             if data_upd:
-#                 self._goods.update({id_upd: good})
-#                 updated += 1
-#             else:
-#                 not_exist.append(id_upd)
-#
-#         return {'successfully_updated': updated, 'errors': {'no such id in goods': not_exist}}
-#
-# class FakeStores:
-#
-#     def __init__(self):
-#         self._stores = {}
-#         self._id_counter = count(1)
+    def put_info_on_goods(self, goods):
+        success_good = 0
+        error_goods_id = []
+
+        for new_value in goods:
+            if new_value['id'] in self._goods.keys():
+                self._goods[new_value['id']] = new_value
+                success_good += 1
+            else:
+                error_goods_id.append(new_value['id'])
+        # import pdb;pdb.set_trace()
+        return success_good, error_goods_id
