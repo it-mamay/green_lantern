@@ -110,7 +110,7 @@ class TestGoods(Initializer):
                 {'name': 'Chocolate_bar', 'price': 10, 'id': 1},
                 {'name': 'Vodka', 'price': 150, 'id': 2},
                 {'name': 'Viskaryk', 'price': 500, 'id': 3},
-                {'name': 'Shmurdyak_try_topora', 'price': 15, 'id': 4}
+                {'name': 'Try_topora', 'price': 15, 'id': 4}
             ]
         )
 
@@ -120,8 +120,8 @@ class TestGoods(Initializer):
                 {'name': 'Chocolate_bar', 'price': 11, 'id': 1},
                 {'name': 'Vodka', 'price': 151, 'id': 2},
                 {'name': 'Viskaryk', 'price': 500, 'id': 3},
-                {'name': 'Shmurdyak_try_topora', 'price': 15, 'id': 4},
-                {'name': 'Shmurdyak_try_topora', 'price': 15, 'id': 5}
+                {'name': 'Try_topora', 'price': 15, 'id': 4},
+                {'name': 'Olenka', 'price': 1500, 'id': 5}
             ]
         )
         assert resp.status_code == 200
@@ -129,3 +129,47 @@ class TestGoods(Initializer):
             'successfully_updated': 4,
             'errors': {'no such id in goods': [5]}
         }
+
+
+class TestStores(Initializer):
+
+    def test_create_store(self):
+        resp = self.client.post(
+            '/store',
+            json={'name': 'Ihor Melnyk', 'location': 'Kyiv', 'manager_id': 1}
+        )
+        assert resp.status_code == 201
+        assert resp.json == {'stored_id': 1}
+
+    def test_get_success_store(self):
+        resp = self.client.post(
+            '/store',
+            json={'name': 'Ihor Melnyk', 'location': 'Kyiv', 'manager_id': 1}
+        )
+
+        store_id = resp.json['stored_id']
+        resp = self.client.get(f'/store/{store_id}')
+
+        assert resp.status_code == 200
+        assert resp.json == {'name': 'Ihor Melnyk', 'location': 'Kyiv', 'manager_id': 1}
+
+    def test_get_unexistent_store(self):
+        resp = self.client.get('/store/1')
+        assert resp.status_code == 404
+        assert resp.json == {'Error': 'No such store id: 1'}
+
+    def test_success_update_store(self):
+        resp = self.client.post(
+            '/store',
+            json={'name': 'Ihor Melnyk', 'location': 'Kyiv', 'manager_id': 11233}
+        )
+
+        store_id = resp.json['stored_id']
+        resp = self.client.put(
+            f'/store/{store_id}',
+            json={'name': 'Igor Melnyk', 'location': 'Lviv', 'manager_id': 105}
+        )
+        assert resp.status_code == 200
+        assert resp.json == {'name': 'Igor Melnyk',
+                             'location': 'Lviv',
+                             'manager_id': 105}

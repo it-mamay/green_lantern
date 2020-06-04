@@ -1,11 +1,12 @@
 from itertools import count
-from store_app import NoSuchUserError
+from store_app import NoSuchUserError, NoSuchUserID, NoSuchStoreID, NoSuchManagerID
 
 
 class FakeStorage:
     def __init__(self):
         self._users = FakeUsers()
         self._goods = FakeGoods()
+        self._stores = FakeStores()
 
     @property
     def users(self):
@@ -15,12 +16,17 @@ class FakeStorage:
     def goods(self):
         return self._goods
 
+    @property
+    def stores(self):
+        return self._stores
+
 
 class FakeUsers:
     def __init__(self):
         self._users = {}
         self._id_counter = count(1)
         self._goods = {}
+        self._stores = {}
 
     def add(self, user):
         user_id = next(self._id_counter)
@@ -51,7 +57,6 @@ class FakeGoods(FakeUsers):
     def get_full_info_of_goods(self):
         full_info = []
         for key, value in self._goods.items():
-            # import pdb; pdb.set_trace()
             full_info.append({**value, 'id': key})
         return full_info
 
@@ -65,5 +70,28 @@ class FakeGoods(FakeUsers):
                 success_good += 1
             else:
                 error_goods_id.append(new_value['id'])
-        # import pdb;pdb.set_trace()
         return success_good, error_goods_id
+
+
+class FakeStores(FakeUsers):
+
+    def create_new_store(self, store):
+        try:
+            store_id = next(self._id_counter)
+            self._stores[store_id] = store
+            return store_id
+        except KeyError:
+            raise NoSuchUserID(store_id)
+
+    def get_full_info(self, store_id):
+        try:
+            full_stores = self._stores[store_id]
+            return full_stores
+        except KeyError:
+            raise NoSuchStoreID(store_id)
+
+    def update_store(self, store, store_id):
+        if store_id not in self._stores.keys():
+            raise NoSuchStoreID(store_id)
+        self._stores[store_id] = {**self._stores[store_id], **store}
+        return self._stores[store_id]
